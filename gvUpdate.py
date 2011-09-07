@@ -55,20 +55,21 @@ def maintain(root, meter_id):
 
 
 def main(root):
-    logging.info('Starting update')
     try:
+        logging.info('Starting update')
         for meter_id in [213, 69, 111, 15, 490]:
             logging.info('Maintaining meter %04i' % meter_id)
             maintain(root, meter_id)
     except greenview.ServerError, e:
-        logging.error(e.message)
+        logging.warning(e)#I know this will happen sometimes so its just a warning
     except Exception, e:
         logging.error('<--------------Unexpected error--------------')
-        logging.error(e.message)
-    logging.info('Update complete')
+        logging.error(e)
+        raise
+    finally:
+        logging.info('Update complete')
     
 if __name__ == "__main__":    
-
     root = os.path.join(os.path.dirname(__file__), 'data')
     if not os.path.exists(root): os.makedirs(root)
     logFile = os.path.join(root, 'update.log')
