@@ -50,18 +50,18 @@ def maintain(root, meter_id):
         with open(dataFile, 'w') as outfile:
             outfile.write(w.to_json(separators=(',', ':')))
         dr.updateFile(latest_on_server)
-        logging.info('meter %04i downloaded' % meter_id)
+        logging.debug('meter %04i download complete' % meter_id)
         print 'ok'
     else:
-        logging.info('meter %04i already downloaded (%s)' % (meter_id, latest_in_file))
+        logging.debug('meter %04i already downloaded (%s)' % (meter_id, latest_in_file))
         print '%04i already downloaded (%s)' % (meter_id, latest_in_file)
 
 
 def main(root):
     try:
-        logging.info('Starting update')
+        logging.debug('Starting update')
         for meter_id in [213, 69, 111, 15, 490]:
-            logging.info('Maintaining meter %04i' % meter_id)
+            logging.debug('Maintaining meter %04i' % meter_id)
             maintain(root, meter_id)
     except greenview.ServerError, e:
         logging.warning(e)#I know this will happen sometimes so its just a warning
@@ -70,11 +70,11 @@ def main(root):
         logging.error(e)
         raise
     finally:
-        logging.info('Update complete')
+        logging.debug('Update complete')
     
 if __name__ == "__main__":    
     root = os.path.join(os.path.dirname(__file__), 'data')
     if not os.path.exists(root): os.makedirs(root)
     logFile = os.path.join(root, 'update.log')
-    logging.basicConfig(filename=logFile, level=logging.INFO, format='%(levelname)s: %(asctime)s %(message)s')
+    logging.basicConfig(filename=logFile, level=logging.WARNING, format='%(levelname)s: %(asctime)s %(message)s')
     main(root)
