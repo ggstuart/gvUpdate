@@ -44,18 +44,14 @@ def maintain(root, meter_id):
     latest_on_server = ws.GraemeLatestReadingDate(meter_id).datetime
     if not latest_in_file or (latest_in_file < latest_on_server):
         logging.info('downloading meter %04i' % meter_id)
-        print 'downloading %04i...' % meter_id,
         w = ws.GraemeLatestWeek(meter_id)
         dataFile = os.path.join(root, 'data_%04i.json' % meter_id)
         with open(dataFile, 'w') as outfile:
             outfile.write(w.to_json(separators=(',', ':')))
         dr.updateFile(latest_on_server)
         logging.debug('meter %04i download complete' % meter_id)
-        print 'ok'
     else:
-        logging.debug('meter %04i already downloaded (%s)' % (meter_id, latest_in_file))
-        print '%04i already downloaded (%s)' % (meter_id, latest_in_file)
-
+        logging.info('meter %04i already downloaded (%s)' % (meter_id, latest_in_file))
 
 def main(root):
     try:
