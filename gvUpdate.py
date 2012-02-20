@@ -1,5 +1,6 @@
 import greenview, os.path, logging
 from datetime import datetime
+import json
 
 class DateRecord(object):
     """represents a file on disk with a simple list of dates"""
@@ -45,9 +46,20 @@ def maintain(root, meter_id):
     if not latest_in_file or (latest_in_file < latest_on_server):
         logging.info('downloading meter %04i' % meter_id)
         w = ws.GraemeLatestWeek(meter_id)
-        dataFile = os.path.join(root, 'data_%04i.json' % meter_id)
-        with open(dataFile, 'w') as outfile:
-            outfile.write(w.to_json(separators=(',', ':')))
+        lw = w.data()
+        profile_file = os.path.join(root, 'profile_%04i.json' % int(meter_id))
+        with open(profile_file, 'r') as f:
+            p = json.load(f)
+        result = {
+            'upper': [p[lw['datetime'][i].strftime("%a%H%M")]['upper'] for i in range(len(lw['value']))],
+            'lower': [p[lw['datetime'][i].strftime("%a%H%M")]['lower'] for i in range(len(lw['value']))],
+            'time_id': [lw['datetime'][i].strftime("%a%H%M") for i in range(len(lw['value']))],
+            'value': list(lw['value']),
+            'datetime': [lw['datetime'][i].strftime("%m/%d/%Y %H:%M:%S") for i in range(len(lw['value']))]
+        }
+        chart_file = os.path.join(root, 'chart_%04i.json' % int(meter_id))
+        with open(chart_file, 'w') as f:
+            json.dump(result, f)
         dr.updateFile(latest_on_server)
         logging.debug('meter %04i download complete' % meter_id)
     else:
@@ -60,6 +72,7 @@ def main(root):
             logging.debug('Maintaining meter %04i' % meter_id)
             maintain(root, meter_id)
     except greenview.ServerError, e:
+        logging.warning('<==============================Server problem==============================')    
         logging.warning(e)#I know this will happen sometimes so its just a warning
     except Exception, e:
         logging.error('<==============================Unexpected error==============================')
