@@ -47,7 +47,8 @@ def maintain(root, meter_id):
         logging.info('downloading meter %04i' % meter_id)
         w = ws.GraemeLatestWeek(meter_id)
         lw = w.data()
-        profile_file = os.path.join(root, 'profile_%04i.json' % int(meter_id))
+        profile_root = os.path.join(os.path.dirname(__file__), 'profiles')
+        profile_file = os.path.join(profile_root, 'profile_%04i.json' % int(meter_id))
         with open(profile_file, 'r') as f:
             p = json.load(f)
         result = {
