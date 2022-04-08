@@ -1,4 +1,3 @@
-===
 Python library for maintaining json files using Greenview web service
 ===
 
